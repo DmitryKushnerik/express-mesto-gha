@@ -16,7 +16,7 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные при создании карточки.' });
+        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные при создании карточки' });
       }
 
       return res.status(DEFAULT_ERROR).send({ message: 'На сервере произошла ошибка' });
@@ -33,7 +33,7 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(NOT_FOUND_ERROR).send({ message: 'Карточка с указанным _id не найдена' });
+        return res.status(VALIDATION_ERROR).send({ message: 'Передан некорректный _id карточки' });
       }
 
       return res.status(DEFAULT_ERROR).send({ message: 'На сервере произошла ошибка' });
@@ -54,10 +54,10 @@ module.exports.likeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
+        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' });
       }
       if (err.name === 'CastError') {
-        return res.status(NOT_FOUND_ERROR).send({ message: 'Передан несуществующий _id карточки' });
+        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' });
       }
       return res.status(DEFAULT_ERROR).send({ message: 'На сервере произошла ошибка' });
     });
@@ -77,10 +77,10 @@ module.exports.dislikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
+        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' });
       }
       if (err.name === 'CastError') {
-        return res.status(NOT_FOUND_ERROR).send({ message: 'Передан несуществующий _id карточки' });
+        return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' });
       }
       return res.status(DEFAULT_ERROR).send({ message: 'На сервере произошла ошибка' });
     });
