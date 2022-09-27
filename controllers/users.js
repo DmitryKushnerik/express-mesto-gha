@@ -54,9 +54,6 @@ module.exports.updateUserInfo = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные при обновлении профиля' });
       }
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(NOT_FOUND_ERROR).send({ message: 'Пользователь с указанным _id не найден' });
-      }
       return res.status(DEFAULT_ERROR).send({ message: 'На сервере произошла ошибка' });
     });
 };
