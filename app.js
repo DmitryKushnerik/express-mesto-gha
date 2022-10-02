@@ -31,7 +31,13 @@ auth();
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use('*', (req, res, next) => { throw new NotFoundError('Запрошенный URL не найден'); });
+app.use('*', (req, res, next) => {
+  try {
+    throw new NotFoundError('Запрошенный URL не найден');
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
