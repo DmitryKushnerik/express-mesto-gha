@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 const AuthorisationError = require('../utils/AuthorisationError');
-const DefaultError = require('../utils/DefaultError');
 const NotFoundError = require('../utils/NotFoundError');
 const ValidationError = require('../utils/ValidationError');
 const UserExistsError = require('../utils/UserExistsError');
@@ -47,6 +46,7 @@ module.exports.getInfoAboutMe = (req, res, next) => {
     });
 };
 
+// eslint-disable-next-line consistent-return
 module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,

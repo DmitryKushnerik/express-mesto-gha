@@ -1,4 +1,3 @@
-const DefaultError = require('../utils/DefaultError');
 const NotFoundError = require('../utils/NotFoundError');
 const ValidationError = require('../utils/ValidationError');
 const ForbiddenError = require('../utils/ForbiddenError');
@@ -18,7 +17,7 @@ module.exports.createCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         return next(new ValidationError('Переданы некорректные данные при создании карточки'));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -37,7 +36,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(ValidationError('Передан некорректный _id карточки'));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -60,7 +59,7 @@ module.exports.likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -83,6 +82,6 @@ module.exports.dislikeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
       }
-      next(err);
+      return next(err);
     });
 };
