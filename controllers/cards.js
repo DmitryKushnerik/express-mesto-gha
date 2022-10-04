@@ -7,7 +7,6 @@ const Card = require('../models/card');
 module.exports.getAllCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => { throw new DefaultError('На сервере произошла ошибка'); })
     .catch(next);
 };
 
@@ -17,33 +16,29 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные при создании карточки');
-      } else {
-        throw new DefaultError('На сервере произошла ошибка');
+        return next(new ValidationError('Переданы некорректные данные при создании карточки'));
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (card === null) {
-        throw new NotFoundError('Карточка с указанным _id не найдена');
+        return next(new NotFoundError('Карточка с указанным _id не найдена'));
       }
       if (card.owner !== req._id) {
-        throw new ForbiddenError('У пользователя нет прав на это действие');
+        return next(new ForbiddenError('У пользователя нет прав на это действие'));
       }
       return res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new ValidationError('Передан некорректный _id карточки');
-      } else {
-        throw new DefaultError('На сервере произошла ошибка');
+        return next(ValidationError('Передан некорректный _id карточки'));
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -54,21 +49,19 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (card === null) {
-        throw new NotFoundError('Передан несуществующий _id карточки');
+        return next(new NotFoundError('Передан несуществующий _id карточки'));
       }
       return res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные для постановки/снятии лайка');
+        return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
       }
       if (err.name === 'CastError') {
-        throw new ValidationError('Переданы некорректные данные для постановки/снятии лайка');
-      } else {
-        throw new DefaultError('На сервере произошла ошибка');
+        return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -79,19 +72,17 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (card === null) {
-        throw new NotFoundError('Передан несуществующий _id карточки');
+        return next(new NotFoundError('Передан несуществующий _id карточки'));
       }
       return res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные для постановки/снятии лайка');
-      } else
-      if (err.name === 'CastError') {
-        throw new ValidationError('Переданы некорректные данные для постановки/снятии лайка');
-      } else {
-        throw new DefaultError('На сервере произошла ошибка');
+        return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
       }
-    })
-    .catch(next);
+      if (err.name === 'CastError') {
+        return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
+      }
+      next(err);
+    });
 };

@@ -27,22 +27,19 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-auth();
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+// auth();
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/cards'));
 
 app.use('*', (req, res, next) => {
-  try {
-    throw new NotFoundError('Запрошенный URL не найден');
-  } catch (err) {
-    next(err);
-  }
+  const err = new NotFoundError('Запрошенный URL не найден');
+  next(err);
+});
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message = 'На сервере произошла ошибка' } = err;
+  res.status(statusCode).send({ message });
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use((err, req, res) => {
-  res.status(err.statusCode).send({ message: err.message });
-});
-
 app.listen(PORT);

@@ -12,9 +12,6 @@ const UserExistsError = require('../utils/UserExistsError');
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => {
-      throw new DefaultError('На сервере произошла ошибка');
-    })
     .catch(next);
 };
 
@@ -22,36 +19,32 @@ module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден');
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new ValidationError('Передан некорректный id пользователя');
-      } else {
-        throw new DefaultError('На сервере произошла ошибка');
+        return next(new ValidationError('Передан некорректный id пользователя'));
       }
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 module.exports.getInfoAboutMe = (req, res, next) => {
   User.findById(req._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден');
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new ValidationError('Передан некорректный id пользователя');
-      } else {
-        throw new DefaultError('На сервере произошла ошибка');
+        return next(new ValidationError('Передан некорректный id пользователя'));
       }
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -59,24 +52,21 @@ module.exports.createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
   if (!validator.isEmail(email)) {
-    throw new ValidationError('Переданы некорректные данные при создании пользователя');
+    return next(new ValidationError('Переданы некорректные данные при создании пользователя'));
   }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
-      name, about, avatar, email, hash,
+      name, about, avatar, email, password: hash,
     }))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные при создании пользователя');
-      } else
-      if (err.code === '11000') {
-        throw new UserExistsError('Пользователь с указанным e-mail уже зарегистрирован');
-      } else {
-        throw new DefaultError('На сервере произошла ошибка');
+        return next(new ValidationError('Переданы некорректные данные при создании пользователя'));
+      } if (err.code === 11000) {
+        return next(new UserExistsError('Пользователь с указанным e-mail уже зарегистрирован'));
       }
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 module.exports.updateUserInfo = (req, res, next) => {
@@ -88,18 +78,16 @@ module.exports.updateUserInfo = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден');
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные при обновлении профиля');
-      } else {
-        throw new DefaultError('На сервере произошла ошибка');
+        return next(new ValidationError('Переданы некорректные данные при обновлении профиля'));
       }
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -111,18 +99,16 @@ module.exports.updateUserAvatar = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден');
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
       }
       return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new ValidationError('Переданы некорректные данные при обновлении профиля');
-      } else {
-        throw new DefaultError('На сервере произошла ошибка');
+        return next(new ValidationError('Переданы некорректные данные при обновлении профиля'));
       }
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -134,11 +120,7 @@ module.exports.login = (req, res, next) => {
         'some-secret-key',
         { expiresIn: '7d' },
       );
-      return token;
-      // res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true });
+      res.send(token);
     })
-    .catch(() => {
-      throw new AuthorisationError('Произошла ошибка авторизации');
-    })
-    .catch(next);
+    .catch(() => next(new AuthorisationError('Произошла ошибка авторизации')));
 };
