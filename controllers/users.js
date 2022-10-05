@@ -125,7 +125,7 @@ module.exports.login = (req, res, next) => {
         'some-secret-key',
         { expiresIn: '7d' },
       );
-      res.send(token);
+      res.send({ user, token });
     })
     .catch(() => next(new AuthorisationError('Произошла ошибка авторизации')));
 };
