@@ -5,14 +5,18 @@ const {
 } = require('../controllers/users');
 
 router.get('/', getAllUsers);
+
 router.get('/:userId', getUserById);
+
 router.get('/me/', getInfoAboutMe);
+
 router.patch('/me/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
   }),
 }), updateUserInfo);
+
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     // eslint-disable-next-line no-useless-escape
