@@ -37,9 +37,9 @@ app.post('/signin', celebrate({
   }),
 }), login);
 
-auth();
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+// auth();
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/cards'));
 
 app.use('*', (req, res, next) => {
   const err = new NotFoundError('Запрошенный URL не найден');
