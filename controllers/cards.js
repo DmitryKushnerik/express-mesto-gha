@@ -22,8 +22,21 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (card === null) {
+        return next(new NotFoundError('Карточка с указанным _id не найдена'));
+      }
+      if (String(card.owner) !== String(req.user._id)) {
+        return next(new ForbiddenError('У пользователя нет прав на это действие'));
+      }
+
+      Card.findByIdAndRemove(req.params.cardId)
+        .then((card) => res.send({ data: card }));
+      // res.send({ owner: card.owner, user: req.user._id });
+    })
   // res.send(req.user._id);
-  Card.findByIdAndRemove(req.params.cardId)
+  /* Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (card === null) {
         return next(new NotFoundError('Карточка с указанным _id не найдена'));
@@ -32,7 +45,7 @@ module.exports.deleteCard = (req, res, next) => {
         return next(new ForbiddenError('У пользователя нет прав на это действие'));
       }
       return res.send({ data: card });
-    })
+    }) */
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(ValidationError('Передан некорректный _id карточки'));
