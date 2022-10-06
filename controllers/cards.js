@@ -22,6 +22,7 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
+  // res.send(req.user._id);
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (card === null) {
