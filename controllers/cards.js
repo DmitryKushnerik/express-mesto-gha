@@ -23,6 +23,7 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
+    // eslint-disable-next-line consistent-return
     .then((card) => {
       if (card === null) {
         return next(new NotFoundError('Карточка с указанным _id не найдена'));
@@ -32,7 +33,7 @@ module.exports.deleteCard = (req, res, next) => {
       }
 
       Card.findByIdAndRemove(req.params.cardId)
-        .then((card) => res.send({ data: card }));
+        .then((delCard) => res.send({ data: delCard }));
       // res.send({ owner: card.owner, user: req.user._id });
     })
   // res.send(req.user._id);

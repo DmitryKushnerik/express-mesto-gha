@@ -31,7 +31,7 @@ function getInfoAboutUser(req, res, next, userID) {
 }
 
 module.exports.getUserById = (req, res, next) => {
-  getInfoAboutUser(req, res, next, req.user._id);
+  getInfoAboutUser(req, res, next, req.params.userId);
   /* User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
