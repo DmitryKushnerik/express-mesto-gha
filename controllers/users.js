@@ -14,8 +14,8 @@ module.exports.getAllUsers = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
+function getInfoAboutUser(req, res, next, userID) {
+  User.findById(userID)
     .then((user) => {
       if (!user) {
         return next(new NotFoundError('Пользователь по указанному _id не найден'));
@@ -28,10 +28,28 @@ module.exports.getUserById = (req, res, next) => {
       }
       return next(err);
     });
+}
+
+module.exports.getUserById = (req, res, next) => {
+  getInfoAboutUser(req, res, next, req.user._id);
+  /* User.findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        return next(new NotFoundError('Пользователь по указанному _id не найден'));
+      }
+      return res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new ValidationError('Передан некорректный id пользователя'));
+      }
+      return next(err);
+    }); */
 };
 
 module.exports.getInfoAboutMe = (req, res, next) => {
-  User.findById(req._id)
+  getInfoAboutUser(req, res, next, req.user._id);
+  /* User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         return next(new NotFoundError('Пользователь по указанному _id не найден'));
@@ -43,7 +61,7 @@ module.exports.getInfoAboutMe = (req, res, next) => {
         return next(new ValidationError('Передан некорректный id пользователя'));
       }
       return next(err);
-    });
+    }); */
 };
 
 // eslint-disable-next-line consistent-return
