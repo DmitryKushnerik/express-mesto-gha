@@ -1,6 +1,6 @@
 const NotFoundError = require('../utils/NotFoundError');
 const ValidationError = require('../utils/ValidationError');
-const ForbiddenError = require('../utils/ForbiddenError');
+// const ForbiddenError = require('../utils/ForbiddenError');
 const Card = require('../models/card');
 
 module.exports.getAllCards = (req, res, next) => {
@@ -27,9 +27,9 @@ module.exports.deleteCard = (req, res, next) => {
       if (card === null) {
         return next(new NotFoundError('Карточка с указанным _id не найдена'));
       }
-      if (card.owner !== req._id) {
+      /* if (card.owner !== req._id) {
         return next(new ForbiddenError('У пользователя нет прав на это действие'));
-      }
+      } */
       return res.send({ data: card });
     })
     .catch((err) => {
