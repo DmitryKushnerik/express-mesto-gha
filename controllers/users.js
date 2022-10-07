@@ -3,10 +3,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
-const AuthorisationError = require('../utils/AuthorisationError');
-const NotFoundError = require('../utils/NotFoundError');
-const ValidationError = require('../utils/ValidationError');
-const UserExistsError = require('../utils/UserExistsError');
+const AuthorisationError = require('../errors/AuthorisationError');
+const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
+const UserExistsError = require('../errors/UserExistsError');
 
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
@@ -32,36 +32,10 @@ function getInfoAboutUser(req, res, next, userID) {
 
 module.exports.getUserById = (req, res, next) => {
   getInfoAboutUser(req, res, next, req.params.userId);
-  /* User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('Пользователь по указанному _id не найден'));
-      }
-      return res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new ValidationError('Передан некорректный id пользователя'));
-      }
-      return next(err);
-    }); */
 };
 
 module.exports.getInfoAboutMe = (req, res, next) => {
   getInfoAboutUser(req, res, next, req.user._id);
-  /* User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('Пользователь по указанному _id не найден'));
-      }
-      return res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new ValidationError('Передан некорректный id пользователя'));
-      }
-      return next(err);
-    }); */
 };
 
 // eslint-disable-next-line consistent-return
