@@ -23,7 +23,6 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
-    // eslint-disable-next-line consistent-return
     .then((card) => {
       if (card === null) {
         return next(new NotFoundError('Карточка с указанным _id не найдена'));
@@ -32,7 +31,7 @@ module.exports.deleteCard = (req, res, next) => {
         return next(new ForbiddenError('У пользователя нет прав на это действие'));
       }
 
-      Card.findByIdAndRemove(req.params.cardId)
+      return Card.findByIdAndRemove(req.params.cardId)
         .then((delCard) => res.send({ data: delCard }));
     })
     .catch((err) => {
@@ -56,9 +55,6 @@ module.exports.likeCard = (req, res, next) => {
       return res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
-      }
       if (err.name === 'CastError') {
         return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
       }
@@ -79,9 +75,6 @@ module.exports.dislikeCard = (req, res, next) => {
       return res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
-      }
       if (err.name === 'CastError') {
         return next(new ValidationError('Переданы некорректные данные для постановки/снятии лайка'));
       }

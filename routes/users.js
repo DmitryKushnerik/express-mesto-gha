@@ -3,6 +3,7 @@ const router = require('express').Router();
 const {
   getAllUsers, getUserById, updateUserInfo, updateUserAvatar, getInfoAboutMe,
 } = require('../controllers/users');
+const { urlTemplate } = require('../utils/validation');
 
 router.get('/', getAllUsers);
 
@@ -17,14 +18,13 @@ router.patch('/me/', celebrate({
 
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().alphanum().length(24),
+    userId: Joi.string().hex().length(24),
   }),
 }), getUserById);
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    // eslint-disable-next-line no-useless-escape
-    avatar: Joi.string().regex(/^https?:\/\/(www\.)?[a-zA-Z0-9\-\._~:\/?#\[\]@!$&'()*+,;=]+\#?/),
+    avatar: Joi.string().regex(urlTemplate),
   }),
 }), updateUserAvatar);
 

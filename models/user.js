@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const { urlTemplate } = require('../utils/validation');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -19,9 +20,7 @@ const userSchema = new mongoose.Schema({
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator(v) {
-        // eslint-disable-next-line no-useless-escape
-        const regexp = /^https?:\/\/(www\.)?[a-zA-Z0-9\-\._~:\/?#\[\]@!$&'()*+,;=]+\#?/;
-        return regexp.test(v);
+        return urlTemplate.test(v);
       },
       message: (props) => `${props.value} не является ссылкой`,
     },
@@ -38,8 +37,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// eslint-disable-next-line func-names
-userSchema.statics.findUserByCredentials = function (email, password) {
+function findUserByCredentialsHandler(email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
@@ -55,6 +53,8 @@ userSchema.statics.findUserByCredentials = function (email, password) {
           return user; // теперь user доступен
         });
     });
-};
+}
+
+userSchema.statics.findUserByCredentials = findUserByCredentialsHandler;
 
 module.exports = mongoose.model('user', userSchema);

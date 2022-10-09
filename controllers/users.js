@@ -1,4 +1,3 @@
-const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
@@ -38,14 +37,10 @@ module.exports.getInfoAboutMe = (req, res, next) => {
   getInfoAboutUser(req, res, next, req.user._id);
 };
 
-// eslint-disable-next-line consistent-return
 module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  if (!validator.isEmail(email)) {
-    return next(new ValidationError('Переданы некорректные данные при создании пользователя'));
-  }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
@@ -54,7 +49,7 @@ module.exports.createUser = (req, res, next) => {
       const result = {
         name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
       };
-      res.send({ data: result });
+      return res.send({ data: result });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

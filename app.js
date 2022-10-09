@@ -1,11 +1,13 @@
-const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { celebrate, Joi, errors } = require('celebrate');
-const NotFoundError = require('./errors/NotFoundError');
+const { /* celebrate, Joi, */ errors } = require('celebrate');
+const routes = require('./routes/index');
+/* const NotFoundError = require('./errors/NotFoundError');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const { urlTemplate } = require('./utils/validation'); */
+const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -19,39 +21,10 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   // useFindAndModify: false,
 });
 
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    // eslint-disable-next-line no-useless-escape
-    avatar: Joi.string().regex(/^https?:\/\/(www\.)?[a-zA-Z0-9\-\._~:\/?#\[\]@!$&'()*+,;=]+\#?/),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), createUser);
-
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
-
-app.use('/users', auth, require('./routes/users'));
-app.use('/cards', auth, require('./routes/cards'));
-
-app.use('*', (req, res, next) => {
-  const err = new NotFoundError('Запрошенный URL не найден');
-  next(err);
-});
+app.use(routes);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message = 'На сервере произошла ошибка' } = err;
-  res.status(statusCode).send({ message });
-  next();
-});
+app.use(errorHandler);
 
-app.use(express.static(path.join(__dirname, 'public')));
 app.listen(PORT);
